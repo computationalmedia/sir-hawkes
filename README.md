@@ -193,7 +193,9 @@ Suppose the new infections in a stochastic SIR process of parameters ![$\{\beta,
 	Suppose also the events in a HawkesN process with parameters ![$\{\mu, \kappa, \theta, N\}$](https://render.githubusercontent.com/render/math?math=%5C%7B%5Cmu%2C+%5Ckappa%2C+%5Ctheta%2C+N%5C%7D&mode=inline) have the intensity ![![$\lambda^H(t)$](https://render.githubusercontent.com/render/math?math=%5Clambda%5EH%28t%29&mode=inline)](https://render.githubusercontent.com/render/math?math=%5Clambda%5EH%28t%29&mode=inline).
 	Let ![$\mathcal{T} = \{\tau_1, \tau_2, \ldots\}$](https://render.githubusercontent.com/render/math?math=%5Cmathcal%7BT%7D+%3D+%5C%7B%5Ctau_1%2C+%5Ctau_2%2C+%5Cldots%5C%7D&mode=inline) be the set of the times to recovery of the infected individuals in SIR.
 	The expectation of ![![$\lambda^I(t)$](https://render.githubusercontent.com/render/math?math=%5Clambda%5EI%28t%29&mode=inline)](https://render.githubusercontent.com/render/math?math=%5Clambda%5EI%28t%29&mode=inline) over ![$\mathcal{T}$](https://render.githubusercontent.com/render/math?math=%5Cmathcal%7BT%7D&mode=inline) is equal ![![$\lambda^H(t)$](https://render.githubusercontent.com/render/math?math=%5Clambda%5EH%28t%29&mode=inline)](https://render.githubusercontent.com/render/math?math=%5Clambda%5EH%28t%29&mode=inline):
-		$E_\mathcal{T}[ \lambda^I(t)] = \lambda^H(t)$,
+		 
+		 ![$E_\mathcal{T}[ \lambda^I(t)] = \lambda^H(t)$](https://render.githubusercontent.com/render/math?math=E_%5Cmathcal%7BT%7D%5B%20%5Clambda%5EI%28t%29%5D%20%3D%20%5Clambda%5EH%28t%29&mode=inline),
+		 
 when ![$\mu = 0$](https://render.githubusercontent.com/render/math?math=%5Cmu+%3D+0&mode=inline), ![$\beta = \kappa \theta$](https://render.githubusercontent.com/render/math?math=%5Cbeta+%3D+%5Ckappa+%5Ctheta&mode=inline), ![$\gamma = \theta$](https://render.githubusercontent.com/render/math?math=%5Cgamma+%3D+%5Ctheta&mode=inline).
 
 Given this theorem, we are able to convert `HawkesN` parameters into `SIR` parameters and compare them with theoretical `SIR` parameters.
