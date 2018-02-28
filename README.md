@@ -188,13 +188,15 @@ print(prnt[, c('K', 'theta', 'c', 'N')], digits = 2)
 We then compare the fitted `HawkesN` parameters with theoretical `SIR` parameters.
 Theorem 3.1 in our paper reveals the link between `HawkesN` and `SIR` models that:
 
-Suppose the new infections in a stochastic SIR process of parameters ![$\{\beta, \gamma, N\}$](https://render.githubusercontent.com/render/math?math=%5C%7B%5Cbeta%2C+%5Cgamma%2C+N%5C%7D&mode=inline
-	follow a point process of intensity ![![$\lambda^I(t)$](https://render.githubusercontent.com/render/math?math=%5Clambda%5EI%28t%29&mode=inline](https://render.githubusercontent.com/render/math?math=%5Clambda%5EI%28t%29&mode=inline.
-	Suppose also the events in a HawkesN process with parameters ![$\{\mu, \kappa, \theta, N\}$](https://render.githubusercontent.com/render/math?math=%5C%7B%5Cmu%2C+%5Ckappa%2C+%5Ctheta%2C+N%5C%7D&mode=inline have the intensity ![![$\lambda^H(t)$](https://render.githubusercontent.com/render/math?math=%5Clambda%5EH%28t%29&mode=inline](https://render.githubusercontent.com/render/math?math=%5Clambda%5EH%28t%29&mode=inline.
-	Let ![$\mathcal{T} = \{\tau_1, \tau_2, \ldots\}$](https://render.githubusercontent.com/render/math?math=%5Cmathcal%7BT%7D+%3D+%5C%7B%5Ctau_1%2C+%5Ctau_2%2C+%5Cldots%5C%7D&mode=inline be the set of the times to recovery of the infected individuals in SIR.
-	The expectation of ![![$\lambda^I(t)$](https://render.githubusercontent.com/render/math?math=%5Clambda%5EI%28t%29&mode=inline](https://render.githubusercontent.com/render/math?math=%5Clambda%5EI%28t%29&mode=inline over ![$\mathcal{T}$](https://render.githubusercontent.com/render/math?math=%5Cmathcal%7BT%7D&mode=inline is equal ![![$\lambda^H(t)$](https://render.githubusercontent.com/render/math?math=%5Clambda%5EH%28t%29&mode=inline](https://render.githubusercontent.com/render/math?math=%5Clambda%5EH%28t%29&mode=inline:
-		$E_\mathcal{T}[ \lambda^I(t)] = \lambda^H(t)$,
-when ![$\mu = 0$](https://render.githubusercontent.com/render/math?math=%5Cmu+%3D+0&mode=inline, ![$\beta = \kappa \theta$](https://render.githubusercontent.com/render/math?math=%5Cbeta+%3D+%5Ckappa+%5Ctheta&mode=inline, ![$\gamma = \theta$](https://render.githubusercontent.com/render/math?math=%5Cgamma+%3D+%5Ctheta&mode=inline.
+Suppose the new infections in a stochastic SIR process of parameters $\{\beta, \gamma, N\}$
+	follow a point process of intensity $\lambda^I(t)$.
+	Suppose also the events in a HawkesN process with parameters $\{\mu, \kappa, \theta, N\}$ have the intensity $\lambda^H(t)$.
+	Let $\mathcal{T} = \{\tau_1, \tau_2, \ldots\}$ be the set of the times to recovery of the infected individuals in SIR.
+	The expectation of $\lambda^I(t)$ over $\mathcal{T}$ is equal $\lambda^H(t)$:
+	\begin{equation*} 
+		E_\mathcal{T}[ \lambda^I(t)] = \lambda^H(t),
+	\end{equation*}
+when $\mu = 0$, $\beta = \kappa \theta$, $\gamma = \theta$.
 
 Given this theorem, we are able to convert `HawkesN` parameters into `SIR` parameters and compare them with theoretical `SIR` parameters.
 
@@ -283,5 +285,5 @@ legend('bottomleft',
 
 
 Several observations (Sec 6.3 in our paper):
- - The apriori probability size distribution shows two maxima. This provides the following explanation for the general perceived unpredictability of online popularity. For cascades showing a bi-modal apriori size distribution, there are two likely outcomes: either it dies out early or it reaches a large size compared to the maximum population ![$N$](https://render.githubusercontent.com/render/math?math=N&mode=inline. At time ![$t = 0$](https://render.githubusercontent.com/render/math?math=t+%3D+0&mode=inline is it impossible to di erentiate between the two outcomes.
+ - The apriori probability size distribution shows two maxima. This provides the following explanation for the general perceived unpredictability of online popularity. For cascades showing a bi-modal apriori size distribution, there are two likely outcomes: either it dies out early or it reaches a large size compared to the maximum population $N$. At time $t = 0$ is it impossible to di erentiate between the two outcomes.
  - The aposteriori probability distribution reflects the information gained from the observed events and it shows a single maximum towards the higher size values. The more events we observe, the higher the likelihood of the true value of cascade size.
