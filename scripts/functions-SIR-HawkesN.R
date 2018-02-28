@@ -7,7 +7,7 @@ library(nloptr)
 #' model. In the stochastic version, time is not given in moments at which the
 #' populations are to be computed, it evolves by itself. Tmax gives the end time
 #' at which simulation halts.
-generate.stochastic.sir <- function(params = c(N = 1300, I.0 = 300, gamma = 0.2, beta = 1),  Tmax = 10) {
+generate.stochastic.sir <- function(params = c(N = 1300, I.0 = 300, gamma = 0.2, beta = 1),  Tmax = 10, hide.output = F) {
   params["b"] <- 0 ## b is the birth = death rate. In a fixed population it is fixed to zero, but I'm puting it here for later dev.
   
   ## start at time 0
@@ -42,7 +42,9 @@ generate.stochastic.sir <- function(params = c(N = 1300, I.0 = 300, gamma = 0.2,
     }
     state <- rbind(state, nextState)
     j <- j + 1
-    cat(sprintf("\rCurrent simulation time: %.3f / %.3f (S=%d, I=%d, R=%d, C=%d).", state$t[j], Tmax, state$S[j], state$I[j], params["N"]-state$S[j]-state$I[j], state$C[j]))
+    if (!hide.output) {
+        cat(sprintf("\rCurrent simulation time: %.3f / %.3f (S=%d, I=%d, R=%d, C=%d).", state$t[j], Tmax, state$S[j], state$I[j], params["N"]-state$S[j]-state$I[j], state$C[j]))
+    }
   }
   
   rownames(state) <- NULL
@@ -50,7 +52,9 @@ generate.stochastic.sir <- function(params = c(N = 1300, I.0 = 300, gamma = 0.2,
   names(state) <- c("time", "I", "S", "C", "R")
   state <- state[c("time", "S", "I", "R", "C")]
   
-  cat(sprintf("\n--> Simulation done!\n"))
+  if (!hide.output) {
+      cat(sprintf("\n--> Simulation done!\n"))
+  }
   return(state)
 }
 
@@ -161,34 +165,20 @@ stochastic.sir.complete.neg.log.likelihood <- function(params = c(N = 1300, I.0 
 ########################### FITTING HawkesN #############################
 
 fitSeries <- function(history, params_init) {
-  model <- list(par = c(K = NA, c = NA, theta = NA, N = NA), value = NA)
+  model <- NA
   tryCatch({
     # ## optimize with NLOPT
     model <- find.optimal.parameters(history = history, init_params = params_init)
   }, error = function(err) {
     print(paste("[fitSeries] Error in optim:  ", err))
-    model <- list(par = c(K = NA, c = NA, theta = NA, N = NA), value = NA)
+    model <- list(par = c(K = NA, c = NA, theta = NA, N = NA), value = NA, iter = 0, convergence = 0, message = 'Error')
   })
+  if (is.na(model) || is.na(model$value)) {
+    model <- list(par = c(K = NA, c = NA, theta = NA, N = NA), value = NA, iter = 0, convergence = 0, message = 'Error')
+  }
 
   return(model)
 }
-
-# # function to generate random initial points
-# generateRandomPoints <- function(seed=NULL){
-#   init_k <- runif(5, min = .Machine$double.eps, max = 10)
-#   init_c <- runif(5, min = .Machine$double.eps, max = 300)
-#   init_theta <- runif(5, min = .Machine$double.eps, max = 3)
-#   init_n <- floor(runif(5, min = 50, max = 5000))
-#   ## 3 known good start points, all NA (which invokes the global optimizer) and all Inf (which lets IPOPT chose its own start point)
-#   init_k[6:10] <- c(0.1, 0.5, 0.8, NA, Inf)
-#   init_beta[6:10] <- c(0.001, 0.5, 0.8, NA, Inf)
-#   init_c[6:10] <- c(10, 100, 60, NA, Inf)
-#   init_theta[6:10] <- c(0.0001, 0.00001, 0.000001, NA, Inf)
-#   init_n[6:10] <- c(60, 200,600, NA, Inf)
-#   init <- data.frame('K' = init_k, 'beta' = init_beta,
-#                      'c' = init_c, 'theta' = init_theta, 'N' = init_n)
-#   return(init)
-# }
 
 find.optimal.parameters <- function(history, init_params = c(K = 0.1, c = 0.1, theta = 0.1, N = 1000), 
                                     lowerBound = c(K = 0, c = .Machine$double.eps, theta = 0, N = 1), 
@@ -261,7 +251,7 @@ neg.log.likelihood <- function(params, history) {
     retVal <- NA
   }
   
-  return( retVal)
+  return(retVal)
 }
 
 #' A function to calculate the value of the integral of lambda for 
