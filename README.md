@@ -34,7 +34,7 @@ source('scripts/functions-size-distribution.R')
 ```
 
 ### 2. Stochachastic R simulation
-We then simulate 20 stochastic SIR realizations. In this step, we chose a set of parameters (<img src="https://rawgit.com/in	git@github.com:computationalmedia/sir-hawkes/master/svgs/e84961284909358d9ae8cb817dd85569.svg?invert_in_darkmode" align=middle width=245.536005pt height=22.83138pt/>) for simulation. Given those simulated events, we are going to fit them with both `SIR` model and our proposed `HawkesN` model to see their modeling performance.
+We then simulate 20 stochastic SIR realizations. In this step, we chose a set of parameters ($N = 1300, I_0 = 300, \gamma = 0.2, \beta = 1$) for simulation. Given those simulated events, we are going to fit them with both `SIR` model and our proposed `HawkesN` model to see their modeling performance.
 
 
 ```R
@@ -109,7 +109,101 @@ stopCluster(.cl)
 res <- as.data.frame(results[1,])
 names(res) <- 1:nsim             
 res <- as.data.frame(t(res))     
-res<img src="https://rawgit.com/in	git@github.com:computationalmedia/sir-hawkes/master/svgs/9914b698d46caf7a7b1b6120c64347ad.svg?invert_in_darkmode" align=middle width=1244.40855pt height=1268.8599pt/>\{\beta, \gamma, N\}<img src="https://rawgit.com/in	git@github.com:computationalmedia/sir-hawkes/master/svgs/5d211b0e3e6971e44cb61ea68560507b.svg?invert_in_darkmode" align=middle width=233.832555pt height=22.83138pt/>\lambda^I(t)<img src="https://rawgit.com/in	git@github.com:computationalmedia/sir-hawkes/master/svgs/2c2b722c19a50b7108d6c84c29eb9c70.svg?invert_in_darkmode" align=middle width=436.804005pt height=22.83138pt/>\{\mu, \kappa, \theta, N\}<img src="https://rawgit.com/in	git@github.com:computationalmedia/sir-hawkes/master/svgs/734ae0cd7c1abb8d83c3326e1d3c141c.svg?invert_in_darkmode" align=middle width=124.374855pt height=22.83138pt/>\lambda^H(t)<img src="https://rawgit.com/in	git@github.com:computationalmedia/sir-hawkes/master/svgs/503de8ef1a6ab1b251dd7a66a6ddcad1.svg?invert_in_darkmode" align=middle width=29.343765pt height=22.46574pt/>\mathcal{T} = \{\tau_1, \tau_2, \ldots\}<img src="https://rawgit.com/in	git@github.com:computationalmedia/sir-hawkes/master/svgs/53b23f78d233638ddd9daab1911ceaee.svg?invert_in_darkmode" align=middle width=588.415905pt height=22.83138pt/>\lambda^I(t)<img src="https://rawgit.com/in	git@github.com:computationalmedia/sir-hawkes/master/svgs/672817601eea255514a955612d495cd9.svg?invert_in_darkmode" align=middle width=32.053065pt height=14.15535pt/>\mathcal{T}<img src="https://rawgit.com/in	git@github.com:computationalmedia/sir-hawkes/master/svgs/3b874d4cad3fc06b8995b77a4ef61ee1.svg?invert_in_darkmode" align=middle width=52.278765pt height=22.83138pt/>\lambda^H(t)<img src="https://rawgit.com/in	git@github.com:computationalmedia/sir-hawkes/master/svgs/f11ece218135bb1a349b13505cb763d3.svg?invert_in_darkmode" align=middle width=182.261805pt height=27.65697pt/>\mu = 0<img src="https://rawgit.com/in	git@github.com:computationalmedia/sir-hawkes/master/svgs/24ee684c2922b0d32c54a34089c92ec0.svg?invert_in_darkmode" align=middle width=4.5662925pt height=14.15535pt/>\beta = \kappa \theta<img src="https://rawgit.com/in	git@github.com:computationalmedia/sir-hawkes/master/svgs/24ee684c2922b0d32c54a34089c92ec0.svg?invert_in_darkmode" align=middle width=4.5662925pt height=14.15535pt/>\gamma = \theta<img src="https://rawgit.com/in	git@github.com:computationalmedia/sir-hawkes/master/svgs/6e11b99d0336defa4a4545df7dc453ea.svg?invert_in_darkmode" align=middle width=700.27485pt height=118.35615pt/>gamma <- res<img src="https://rawgit.com/in	git@github.com:computationalmedia/sir-hawkes/master/svgs/5697e373afedc5962ce6f6b59694a896.svg?invert_in_darkmode" align=middle width=60.91932pt height=22.83138pt/>beta <- res<img src="https://rawgit.com/in	git@github.com:computationalmedia/sir-hawkes/master/svgs/8b302efaf0737751585d22c22c415bbf.svg?invert_in_darkmode" align=middle width=53.89461pt height=22.46574pt/>theta
+res$ll <- unlist(results[2,])
+complete_res <- res
+```
+
+In the following block, we show how well parameters were retreived by our fitting process. Generally, the median values are closed to the theoretical values with a small standard deviation.
+
+
+```R
+# let's see how well parameters were retreived
+prnt <- rbind(params.S[c('N', 'I.0', 'gamma', 'beta')], 
+              apply(X = complete_res[, c('N', 'I.0', 'gamma', 'beta')], MARGIN = 2, FUN = median),
+              apply(X = complete_res[, c('N', 'I.0', 'gamma', 'beta')], MARGIN = 2, FUN = sd))
+rownames(prnt) <- c('theoretical', 'median', 'sd')
+print(prnt[, c('N', 'I.0', 'gamma', 'beta')], digits = 2)
+```
+
+                     N I.0 gamma  beta
+    theoretical 1300.0 300 0.200 1.000
+    median      1283.5 300 0.200 0.986
+    sd             3.6   0 0.006 0.026
+
+
+### 4. Fit HawkesN on simulated cascades
+
+We need first to pull out the infective events for HawkesN model.
+
+
+```R
+# get the means at given time points, to be able to compare to deterministic
+simhistory <- sapply(X = 1:nsim, FUN = function(i) {
+  history.S <- SIR2HAWKES.stochastic.event.series(state = simdat[,i])  
+})
+```
+
+We model HawkesN on the simulated data following same steps as modeling SIR:
+ - Choose a starting point for all parameters.
+ - Apply LBFGS algorithm for optimizing the likelihood function of `HawkesN` model (This step might take quite a lot of time).
+
+
+```R
+# start point 
+params.fit.start <- c(K = 1, c = 0.1, theta = 0.1, N = 1000)
+
+# fit the event series with HawkesN
+.cl <- makeCluster(spec = min(20, detectCores()), type = 'FORK')
+results <- parSapply(cl = .cl, X = 1:nsim, FUN = function(i) {
+  history.S <- as.data.frame(simhistory[,i])
+  fitted.model <- fitSeries(history = history.S, params.fit.start)
+})
+stopCluster(.cl)
+res <- as.data.frame(results['par',])
+names(res) <- 1:nsim
+res <- data.frame(t(res))
+```
+
+We compare the fitted `HawkesN` parameters with theoretical `HawkesN` parameters.
+
+
+```R
+# these are the theoretical parameters
+params.H <- c(K = 5, c = 0.001, theta = 0.2, N = 1300)
+
+prnt <- rbind(params.H, 
+              apply(X = res, MARGIN = 2, FUN = median, na.rm = T),
+              apply(X = res, MARGIN = 2, FUN = sd, na.rm = T))
+rownames(prnt) <- c('theoretical', 'median', 'sd')
+print(prnt[, c('K', 'theta', 'c', 'N')], digits = 2)
+
+```
+
+                  K theta     c    N
+    theoretical 5.0  0.20 0.001 1300
+    median      5.5  0.18 0.100 1292
+    sd          2.1  8.52 0.000   11
+
+
+We then compare the fitted `HawkesN` parameters with theoretical `SIR` parameters.
+Theorem 3.1 in our paper reveals the link between `HawkesN` and `SIR` models that:
+
+Suppose the new infections in a stochastic SIR process of parameters $\{\beta, \gamma, N\}$
+	follow a point process of intensity $\lambda^I(t)$.
+	Suppose also the events in a HawkesN process with parameters $\{\mu, \kappa, \theta, N\}$ have the intensity $\lambda^H(t)$.
+	Let $\mathcal{T} = \{\tau_1, \tau_2, \ldots\}$ be the set of the times to recovery of the infected individuals in SIR.
+	The expectation of $\lambda^I(t)$ over $\mathcal{T}$ is equal $\lambda^H(t)$:
+	\begin{equation*} 
+		E_\mathcal{T}[ \lambda^I(t)] = \lambda^H(t),
+	\end{equation*}
+when $\mu = 0$, $\beta = \kappa \theta$, $\gamma = \theta$.
+
+Given this theorem, we are able to convert `HawkesN` parameters into `SIR` parameters and compare them with theoretical `SIR` parameters.
+
+
+```R
+res$gamma <- res$theta
+res$beta <- res$K * res$theta
 prnt <- rbind(params.S[c('N', 'gamma', 'beta')], 
               apply(X = res[, c('N', 'gamma', 'beta')], MARGIN = 2, FUN = mean, na.rm = T),
               apply(X = res[, c('N', 'gamma', 'beta')], MARGIN = 2, FUN = sd, na.rm = T))
@@ -165,13 +259,19 @@ We then plot both apriori probability size distribution and aposteriori probabil
 
 ```R
 # plot our cascade
-matplot(cbind(size.est.at.zero<img src="https://rawgit.com/in	git@github.com:computationalmedia/sir-hawkes/master/svgs/6be94403d6d6f5823e7d0115e22125cc.svg?invert_in_darkmode" align=middle width=192.145305pt height=22.83138pt/>final.state), 
+matplot(cbind(size.est.at.zero$final.state, size.est.at.end$final.state), 
         col = c('black', 'blue'), type = 'l', log = 'y', lty = c(1, 1), lwd = 3,
         xlab = 'Cascade final size', ylab = 'Probability',
         main = sprintf('Probability distribution of cascade final size\nfitted on %d seen events (N = %.2f)\n(seen %%: %.2f)', 
                        seenEvents, params.H['N'], seen_perc) )
 abline(v = seenEvents, lty = 3, col = 'gray40')
-abline(v = size.est.at.end<img src="https://rawgit.com/in	git@github.com:computationalmedia/sir-hawkes/master/svgs/9bc9462d58d1b876835015ec4910f794.svg?invert_in_darkmode" align=middle width=926.04435pt height=47.67114pt/>theo.mean), 
+abline(v = size.est.at.end$theo.mean, lty = 2, col = 'darkmagenta')
+abline(v = nrow(history), lty = 1, col = 'red')
+legend('bottomleft', 
+        legend = c('Stoch. size distribution (apriori)', 
+                   'Stoch. size distribution (aposteriori)',
+                   sprintf('Observed events (%d)', seenEvents), 
+                   sprintf('Deterministic size (%.2f)', size.est.at.zero$theo.mean), 
                    sprintf('Observed final size (%d)', nrow(history)) ), 
         lty = c(1, 1, 3, 2, 1), lwd = c(3, 3, 1, 1, 1), col = c('black', 'blue', 'gray40', 'darkmagenta', 'red'), bty = 'n')
 ```
@@ -185,5 +285,5 @@ abline(v = size.est.at.end<img src="https://rawgit.com/in	git@github.com:computa
 
 
 Several observations (Sec 6.3 in our paper):
- - The apriori probability size distribution shows two maxima. This provides the following explanation for the general perceived unpredictability of online popularity. For cascades showing a bi-modal apriori size distribution, there are two likely outcomes: either it dies out early or it reaches a large size compared to the maximum population <img src="https://rawgit.com/in	git@github.com:computationalmedia/sir-hawkes/master/svgs/f9c4988898e7f532b9f826a75014ed3c.svg?invert_in_darkmode" align=middle width=14.999985pt height=22.46574pt/>. At time <img src="https://rawgit.com/in	git@github.com:computationalmedia/sir-hawkes/master/svgs/477a717e18587a5e8605780ca167c322.svg?invert_in_darkmode" align=middle width=36.07296pt height=21.18732pt/> is it impossible to di erentiate between the two outcomes.
+ - The apriori probability size distribution shows two maxima. This provides the following explanation for the general perceived unpredictability of online popularity. For cascades showing a bi-modal apriori size distribution, there are two likely outcomes: either it dies out early or it reaches a large size compared to the maximum population $N$. At time $t = 0$ is it impossible to di erentiate between the two outcomes.
  - The aposteriori probability distribution reflects the information gained from the observed events and it shows a single maximum towards the higher size values. The more events we observe, the higher the likelihood of the true value of cascade size.
