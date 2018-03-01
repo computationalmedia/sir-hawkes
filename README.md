@@ -34,7 +34,7 @@ source('scripts/functions-size-distribution.R')
 ```
 
 ### 2. Stochachastic R simulation
-We then simulate 20 stochastic SIR realizations. In this step, we chose a set of parameters ($N = 1300, I_0 = 300, \gamma = 0.2, \beta = 1$) for simulation. Given those simulated events, we are going to fit them with both `SIR` model and our proposed `HawkesN` model to see their modeling performance.
+We then simulate 20 stochastic SIR realizations. In this step, we chose a set of parameters (![$N = 1300, I_0 = 300, \gamma = 0.2, \beta = 1$](https://render.githubusercontent.com/render/math?math=N%20%3D%201300%2C%20I_0%20%3D%20300%2C%20%5Cgamma%20%3D%200.2%2C%20%5Cbeta%20%3D%201&mode=inline)) for simulation. Given those simulated events, we are going to fit them with both `SIR` model and our proposed `HawkesN` model to see their modeling performance.
 
 
 ```R
