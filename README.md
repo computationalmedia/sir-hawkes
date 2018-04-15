@@ -33,7 +33,7 @@ source('scripts/functions-SIR-HawkesN.R')
 source('scripts/functions-size-distribution.R')
 ```
 
-### 2. Stochachastic R simulation
+### 2. Stochastic R simulation
 We then simulate 20 stochastic SIR realizations. In this step, we chose a set of parameters (![$N = 1300, I_0 = 300, \gamma = 0.2, \beta = 1$](https://render.githubusercontent.com/render/math?math=N%20%3D%201300%2C%20I_0%20%3D%20300%2C%20%5Cgamma%20%3D%200.2%2C%20%5Cbeta%20%3D%201&mode=inline)) for simulation. Given those simulated events, we are going to fit them with both `SIR` model and our proposed `HawkesN` model to see their modeling performance.
 
 
@@ -145,7 +145,7 @@ simhistory <- sapply(X = 1:nsim, FUN = function(i) {
 
 We model HawkesN on the simulated data following same steps as modeling SIR:
  - Choose a starting point for all parameters.
- - Apply LBFGS algorithm for optimizing the likelihood function of `HawkesN` model (This step might take quite a lot of time).
+ - Apply LBFGS algorithm for optimizing the likelihood function of `HawkesN` model (this step might take quite a lot of time).
 
 
 ```R
